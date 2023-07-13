@@ -1,9 +1,6 @@
 # This is base config for php | used as reference and this file will not be executed
 FROM php:8.1.20-fpm-alpine3.17
 
-LABEL Maintainer="Jose Quintana <joseluisq.net>" \
-    Description="PHP-FPM v8.1 with essential extensions on top of Alpine Linux."
-
 # Composer - https://getcomposer.org/download/
 ARG COMPOSER_VERSION="2.5.8"
 ARG COMPOSER_SUM="f07934fad44f9048c0dc875a506cca31cc2794d6aebfc1867f3b1fbf48dce2c5"

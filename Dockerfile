@@ -320,9 +320,9 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
 RUN echo "Done downloading composer"
 
 # Copy PHP-FPM configuration files
-COPY 8.1-fpm/php-fpm.tmpl.conf /var/data/php-fpm/php-fpm.tmpl.conf
-COPY 8.1-fpm/www.tmpl.conf /var/data/php-fpm/www.tmpl.conf
-COPY 8.1-fpm/php.tmpl.ini /var/data/php-fpm/default-php.tmpl.ini
+COPY ./Docker/8.1-fpm/php-fpm.tmpl.conf /var/data/php-fpm/php-fpm.tmpl.conf
+COPY ./Docker/8.1-fpm/www.tmpl.conf /var/data/php-fpm/www.tmpl.conf
+COPY ./Docker/8.1-fpm/php.tmpl.ini /var/data/php-fpm/default-php.tmpl.ini
 
 RUN set -eux \
 # PHP-FPM templates directory
@@ -350,16 +350,10 @@ RUN set -eux \
     && true
 
 # Copy util scripts
-COPY 8.1-fpm/envsubst.sh /envsubst.sh
-COPY 8.1-fpm/entrypoint.sh /entrypoint.sh
+COPY ./Docker/8.1-fpm/envsubst.sh /envsubst.sh
+COPY ./Docker/8.1-fpm/entrypoint.sh /entrypoint.sh
 
 STOPSIGNAL SIGQUIT
-
-ENTRYPOINT ["/entrypoint.sh"]
-
-EXPOSE 9000
-CMD ["php-fpm"]
-
 
 # Metadata
 LABEL org.opencontainers.image.vendor="Jose Quintana" \
@@ -386,11 +380,14 @@ RUN apk update && \
 
 # Copy lighttpd config files. At this point it is all default except
 # including a custom ssl.conf in lighttpd.conf.
-COPY config/*.conf /etc/lighttpd/
+COPY ./Docker/config/*.conf /etc/lighttpd/
 
-# Copy an example index.html to the default webroot to allow
-# for demo/testing without needing mounts during `docker run`
-COPY htdocs/index.html /var/www/localhost/htdocs/
+# change this to suit your directory
+COPY . /var/www/andropedia 
+
+RUN rm composer.lock
+RUN composer update
+
 
 # Check every minute if lighttpd responds within 1 second and update
 # container health status accordingly.
@@ -405,4 +402,3 @@ VOLUME /etc/lighttpd/
 VOLUME /var/www/
 
 CMD php-fpm -D && lighttpd -D -f /etc/lighttpd/lighttpd.conf
-# ENTRYPOINT ["/usr/sbin/lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf"]
