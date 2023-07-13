@@ -388,6 +388,11 @@ COPY . /var/www/andropedia
 RUN rm composer.lock
 RUN composer update
 
+RUN apk add npm
+RUN npm install --global yarn
+RUN yarn
+RUN yarn production
+RUN yarn tailwind-production
 
 # Check every minute if lighttpd responds within 1 second and update
 # container health status accordingly.
